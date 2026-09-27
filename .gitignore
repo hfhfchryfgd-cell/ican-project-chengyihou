@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+
+data/*
+!data/.gitkeep
+
+models/*
+!models/.gitkeep
+*.pt
+*.pth
+*.onnx
+
+*.tmp
+*.log
