@@ -1,0 +1,198 @@
+{
+  "_about": "矢量插图源。桌面版与网页版读同一个文件：网页端由 /api/figures 取出后用 SVG 渲染，桌面版由 ui/graphics.py 用 QPainter 画。同一份几何、两套后端，改一次两边同时生效，不会出现'文档里的图和软件里的图不一样'。",
+  "_coords": "所有图形的 viewBox 统一为 100 × 58。长度单位是 viewBox 单位，字号需按渲染宽度除以 100 反算（例：渲染宽 380px 时，字号 3.2 ≈ 12px）。",
+  "_primitives": {
+    "line":   "{x1,y1,x2,y2,k=描边色,w=线宽,d=虚线如'4 3',a=1 表示末端带箭头}",
+    "rect":   "{x,y,w,h,rx,k,f}",
+    "circle": "{cx,cy,r,k,f,dw=描边宽}",
+    "poly":   "{p=[[x,y],…],k,f,close=1}",
+    "arc":    "{cx,cy,r,a0,a1=角度(度,0 为 3 点钟方向,顺时针为正),k,w,a=1}",
+    "text":   "{x,y,v=文字,size,anchor=start|middle|end,color,w=字重,mono=1}",
+    "icon":   "{name,x,y,size,color}",
+    "dim":    "{x1,y1,x2,y2,label,color}"
+  },
+  "tokens": {
+    "ink": "#DCE7F5", "sub": "#8FA3C0", "faint": "#33456A", "ghost": "#22304A",
+    "accent": "#22D3EE", "blue": "#3B82F6", "warn": "#FBBF24",
+    "danger": "#F87171", "ok": "#34D399", "violet": "#A78BFA",
+    "panel": "#16213A", "deck": "#1E2C48", "none": "none"
+  },
+  "glyphs": {
+    "_about": "以原点为中心、半径 10 为界的图形，用 icon 图元按 size 缩放放置。只用 line/circle/poly 三种图元，两种渲染器都不必实现贝塞尔。",
+    "drone": [
+      { "t": "line", "x1": -3.4, "y1": -3.4, "x2": -6.4, "y2": -6.4, "k": "ink", "w": 1 },
+      { "t": "line", "x1": 3.4, "y1": -3.4, "x2": 6.4, "y2": -6.4, "k": "ink", "w": 1 },
+      { "t": "line", "x1": -3.4, "y1": 3.4, "x2": -6.4, "y2": 6.4, "k": "ink", "w": 1 },
+      { "t": "line", "x1": 3.4, "y1": 3.4, "x2": 6.4, "y2": 6.4, "k": "ink", "w": 1 },
+      { "t": "circle", "cx": -7.4, "cy": -7.4, "r": 3, "k": "accent", "dw": 1 },
+      { "t": "circle", "cx": 7.4, "cy": -7.4, "r": 3, "k": "accent", "dw": 1 },
+      { "t": "circle", "cx": -7.4, "cy": 7.4, "r": 3, "k": "accent", "dw": 1 },
+      { "t": "circle", "cx": 7.4, "cy": 7.4, "r": 3, "k": "accent", "dw": 1 },
+      { "t": "rect", "x": -3.6, "y": -3.6, "w": 7.2, "h": 7.2, "rx": 2, "k": "ink", "f": "panel" }
+    ],
+    "rtk": [
+      { "t": "line", "x1": 0, "y1": 9, "x2": 0, "y2": 2, "k": "ink", "w": 1 },
+      { "t": "line", "x1": -3.4, "y1": 9, "x2": 3.4, "y2": 9, "k": "ink", "w": 1 },
+      { "t": "circle", "cx": 0, "cy": 0, "r": 1.8, "k": "accent", "f": "accent" },
+      { "t": "arc", "cx": 0, "cy": 0, "r": 4.6, "a0": -140, "a1": -40, "k": "accent", "w": 1.1 },
+      { "t": "arc", "cx": 0, "cy": 0, "r": 8, "a0": -140, "a1": -40, "k": "accent", "w": 1.1 }
+    ],
+    "gimbal": [
+      { "t": "circle", "cx": 0, "cy": 0, "r": 3, "k": "ink", "dw": 1.3 },
+      { "t": "line", "x1": -8, "y1": 0, "x2": 8, "y2": 0, "k": "faint", "w": 1 },
+      { "t": "line", "x1": 0, "y1": -8, "x2": 0, "y2": 8, "k": "faint", "w": 1 },
+      { "t": "circle", "cx": 0, "cy": 0, "r": 8, "k": "faint", "dw": 1, "d": "2.4 2" }
+    ],
+    "beam": [
+      { "t": "poly", "p": [[0, -6], [5.4, 0], [0, 6]], "k": "accent", "f": "none", "close": 1 },
+      { "t": "line", "x1": 5.4, "y1": 0, "x2": 8, "y2": -6.4, "k": "accent", "w": 1, "a": 1 },
+      { "t": "line", "x1": 5.4, "y1": 0, "x2": 8, "y2": 6.4, "k": "accent", "w": 1, "a": 1 },
+      { "t": "line", "x1": 8, "y1": -6.4, "x2": 8, "y2": 6.4, "k": "accent", "w": 1, "d": "2 1.6" }
+    ]
+  },
+  "figures": {
+    "scan_grid": {
+      "title": "网格化扫描",
+      "sub": "桥梁侧面按固定行高铺开，横向重叠 ≥ 75%",
+      "items": [
+        { "t": "rect", "x": 3, "y": 11, "w": 94, "h": 5, "f": "deck", "k": "faint" },
+        { "t": "rect", "x": 15.5, "y": 16, "w": 12, "h": 2.4, "f": "deck", "k": "faint" },
+        { "t": "rect", "x": 45.5, "y": 16, "w": 12, "h": 2.4, "f": "deck", "k": "faint" },
+        { "t": "rect", "x": 75.5, "y": 16, "w": 12, "h": 2.4, "f": "deck", "k": "faint" },
+        { "t": "rect", "x": 19, "y": 18.4, "w": 5, "h": 30, "f": "panel", "k": "faint" },
+        { "t": "rect", "x": 49, "y": 18.4, "w": 5, "h": 30, "f": "panel", "k": "faint" },
+        { "t": "rect", "x": 79, "y": 18.4, "w": 5, "h": 30, "f": "panel", "k": "faint" },
+        { "t": "line", "x1": 2, "y1": 48.4, "x2": 98, "y2": 48.4, "k": "faint", "w": 1 },
+        { "t": "line", "x1": 6, "y1": 51, "x2": 6, "y2": 48.4, "k": "ghost", "w": 1 },
+        { "t": "line", "x1": 16, "y1": 51, "x2": 16, "y2": 48.4, "k": "ghost", "w": 1 },
+        { "t": "line", "x1": 26, "y1": 51, "x2": 26, "y2": 48.4, "k": "ghost", "w": 1 },
+        { "t": "line", "x1": 36, "y1": 51, "x2": 36, "y2": 48.4, "k": "ghost", "w": 1 },
+        { "t": "line", "x1": 46, "y1": 51, "x2": 46, "y2": 48.4, "k": "ghost", "w": 1 },
+        { "t": "line", "x1": 56, "y1": 51, "x2": 56, "y2": 48.4, "k": "ghost", "w": 1 },
+        { "t": "line", "x1": 66, "y1": 51, "x2": 66, "y2": 48.4, "k": "ghost", "w": 1 },
+        { "t": "line", "x1": 76, "y1": 51, "x2": 76, "y2": 48.4, "k": "ghost", "w": 1 },
+        { "t": "line", "x1": 86, "y1": 51, "x2": 86, "y2": 48.4, "k": "ghost", "w": 1 },
+        { "t": "poly", "p": [[24, 9.5], [14, 19], [34, 19]], "k": "accent", "f": "none", "close": 1 },
+        { "t": "line", "x1": 14, "y1": 19, "x2": 14, "y2": 48.4, "k": "accent", "w": 0.8, "d": "2 2" },
+        { "t": "line", "x1": 34, "y1": 19, "x2": 34, "y2": 48.4, "k": "accent", "w": 0.8, "d": "2 2" },
+        { "t": "line", "x1": 14, "y1": 26, "x2": 34, "y2": 26, "k": "accent", "w": 0.8, "d": "2 2" },
+        { "t": "line", "x1": 14, "y1": 33, "x2": 34, "y2": 33, "k": "accent", "w": 0.8, "d": "2 2" },
+        { "t": "line", "x1": 14, "y1": 40, "x2": 34, "y2": 40, "k": "accent", "w": 0.8, "d": "2 2" },
+        { "t": "icon", "name": "drone", "x": 24, "y": 7, "size": 2.4, "color": "ink" },
+        { "t": "dim", "x1": 21.5, "y1": 54.4, "x2": 51.5, "y2": 54.4, "label": "桥墩间距 20 m" },
+        { "t": "text", "x": 24, "y": 6.2, "v": "航线", "size": 3.1, "anchor": "middle", "color": "sub" }
+      ]
+    },
+    "scan_orbit": {
+      "title": "墩柱环绕",
+      "sub": "周向 120° 分层，每层换一个视角重拍同一墩面",
+      "items": [
+        { "t": "circle", "cx": 50, "cy": 29, "r": 7.5, "k": "faint", "f": "panel" },
+        { "t": "text", "x": 50, "y": 30.4, "v": "墩柱", "size": 3, "anchor": "middle", "color": "sub" },
+        { "t": "circle", "cx": 50, "cy": 29, "r": 17, "k": "accent", "dw": 0.9, "d": "4 3" },
+        { "t": "circle", "cx": 50, "cy": 29, "r": 23, "k": "ghost", "dw": 0.9, "d": "2 3" },
+        { "t": "arc", "cx": 50, "cy": 29, "r": 17, "a0": -96, "a1": -24, "k": "accent", "w": 1.1, "a": 1 },
+        { "t": "arc", "cx": 50, "cy": 29, "r": 17, "a0": 24, "a1": 96, "k": "accent", "w": 1.1, "a": 1 },
+        { "t": "arc", "cx": 50, "cy": 29, "r": 17, "a0": 144, "a1": 216, "k": "accent", "w": 1.1, "a": 1 },
+        { "t": "icon", "name": "drone", "x": 50, "y": 6.6, "size": 2.3, "color": "ink" },
+        { "t": "icon", "name": "drone", "x": 73.2, "y": 40.5, "size": 2.3, "color": "ink" },
+        { "t": "icon", "name": "drone", "x": 26.8, "y": 40.5, "size": 2.3, "color": "ink" },
+        { "t": "dim", "x1": 50, "y1": 29, "x2": 50, "y2": 12, "label": "拍摄距离" },
+        { "t": "text", "x": 50, "y": 55, "v": "同一墩面的三组同视场影像：0° / 120° / 240°", "size": 3.1, "anchor": "middle", "color": "sub" }
+      ]
+    },
+    "scan_zigzag": {
+      "title": "梁底定距扫描",
+      "sub": "距梁底固定 1.5 m，以 0.5 m/s 缓慢之字形推进",
+      "items": [
+        { "t": "rect", "x": 3, "y": 6, "w": 94, "h": 5, "f": "deck", "k": "faint" },
+        { "t": "line", "x1": 3, "y1": 11, "x2": 97, "y2": 11, "k": "blue", "w": 1.1 },
+        { "t": "text", "x": 5, "y": 4.4, "v": "梁体", "size": 3, "color": "sub" },
+        { "t": "line", "x1": 12, "y1": 11, "x2": 12, "y2": 21, "k": "faint", "w": 0.8, "d": "2 2" },
+        { "t": "dim", "x1": 10.6, "y1": 11, "x2": 10.6, "y2": 21, "label": "1.5 m", "color": "warn" },
+        { "t": "poly", "p": [[14, 21], [38, 21], [38, 27], [14, 27], [14, 33], [38, 33], [38, 39], [14, 39]],
+          "k": "accent", "f": "none" },
+        { "t": "poly", "p": [[38, 39], [62, 39], [62, 33], [38, 33]], "k": "accent", "f": "none" },
+        { "t": "line", "x1": 38, "y1": 21, "x2": 44, "y2": 21, "k": "accent", "w": 1, "a": 1 },
+        { "t": "icon", "name": "drone", "x": 26, "y": 21, "size": 2.2, "color": "ink" },
+        { "t": "text", "x": 40, "y": 20, "v": "0.5 m/s", "size": 3.1, "color": "warn" },
+        { "t": "line", "x1": 26, "y1": 24.4, "x2": 26, "y2": 30, "k": "ghost", "w": 0.8, "d": "1.6 1.6" },
+        { "t": "text", "x": 26, "y": 32, "v": "逐行推进", "size": 2.9, "anchor": "middle", "color": "sub" },
+        { "t": "line", "x1": 62, "y1": 36, "x2": 78, "y2": 36, "k": "ghost", "w": 0.8, "d": "2 2" },
+        { "t": "text", "x": 80, "y": 37.2, "v": "转入下一跨", "size": 2.9, "color": "sub" }
+      ]
+    },
+    "scan_bearing": {
+      "title": "支座局部环绕",
+      "sub": "每 90° 一组，四组影像拼出支座全貌",
+      "items": [
+        { "t": "rect", "x": 8, "y": 8, "w": 84, "h": 5, "f": "deck", "k": "faint" },
+        { "t": "text", "x": 10, "y": 6.4, "v": "梁体", "size": 3, "color": "sub" },
+        { "t": "rect", "x": 43, "y": 13, "w": 14, "h": 6.4, "rx": 1, "f": "panel", "k": "warn" },
+        { "t": "text", "x": 50, "y": 17.6, "v": "支座", "size": 2.9, "anchor": "middle", "color": "warn" },
+        { "t": "rect", "x": 38, "y": 19.4, "w": 24, "h": 24, "f": "panel", "k": "faint" },
+        { "t": "line", "x1": 2, "y1": 43.4, "x2": 98, "y2": 43.4, "k": "faint", "w": 1 },
+        { "t": "circle", "cx": 50, "cy": 17, "r": 14, "k": "accent", "dw": 0.9, "d": "4 3" },
+        { "t": "icon", "name": "drone", "x": 50, "y": 3, "size": 2.2, "color": "ink" },
+        { "t": "icon", "name": "drone", "x": 64, "y": 17, "size": 2.2, "color": "ink" },
+        { "t": "icon", "name": "drone", "x": 50, "y": 31, "size": 2.2, "color": "ink" },
+        { "t": "icon", "name": "drone", "x": 36, "y": 17, "size": 2.2, "color": "ink" },
+        { "t": "line", "x1": 50, "y1": 5.2, "x2": 46, "y2": 13, "k": "accent", "w": 0.9, "d": "2 1.6" },
+        { "t": "line", "x1": 61.8, "y1": 17, "x2": 58, "y2": 17, "k": "accent", "w": 0.9, "d": "2 1.6" },
+        { "t": "line", "x1": 50, "y1": 28.8, "x2": 54, "y2": 20, "k": "accent", "w": 0.9, "d": "2 1.6" },
+        { "t": "line", "x1": 38.2, "y1": 17, "x2": 42, "y2": 17, "k": "accent", "w": 0.9, "d": "2 1.6" },
+        { "t": "text", "x": 50, "y": 52, "v": "测点 A / B / C / D 四向覆盖，重叠率 ≥ 80%", "size": 3.1, "anchor": "middle", "color": "sub" }
+      ]
+    },
+    "loop_position": {
+      "title": "空间位置重复定位闭环",
+      "sub": "RTK 与激光雷达互为校验，把同视场重访的位置误差压到分米级",
+      "items": [
+        { "t": "rect", "x": 3, "y": 20, "w": 20, "h": 11, "rx": 1.4, "f": "panel", "k": "faint" },
+        { "t": "text", "x": 13, "y": 24.4, "v": "RTK +", "size": 3, "anchor": "middle", "color": "ink" },
+        { "t": "text", "x": 13, "y": 28.4, "v": "激光雷达", "size": 3, "anchor": "middle", "color": "ink" },
+        { "t": "rect", "x": 30, "y": 20, "w": 20, "h": 11, "rx": 1.4, "f": "panel", "k": "faint" },
+        { "t": "text", "x": 40, "y": 26.4, "v": "比较元件", "size": 3, "anchor": "middle", "color": "ink" },
+        { "t": "rect", "x": 57, "y": 20, "w": 16, "h": 11, "rx": 1.4, "f": "panel", "k": "faint" },
+        { "t": "text", "x": 65, "y": 26.4, "v": "飞控", "size": 3, "anchor": "middle", "color": "ink" },
+        { "t": "rect", "x": 80, "y": 20, "w": 17, "h": 11, "rx": 1.4, "f": "panel", "k": "faint" },
+        { "t": "text", "x": 88.5, "y": 26.4, "v": "无人机", "size": 3, "anchor": "middle", "color": "ink" },
+        { "t": "line", "x1": 23, "y1": 25.5, "x2": 29.4, "y2": 25.5, "k": "accent", "w": 1, "a": 1 },
+        { "t": "line", "x1": 50, "y1": 25.5, "x2": 56.4, "y2": 25.5, "k": "accent", "w": 1, "a": 1 },
+        { "t": "line", "x1": 73, "y1": 25.5, "x2": 79.4, "y2": 25.5, "k": "accent", "w": 1, "a": 1 },
+        { "t": "line", "x1": 88.5, "y1": 31, "x2": 88.5, "y2": 42, "k": "blue", "w": 1 },
+        { "t": "line", "x1": 88.5, "y1": 42, "x2": 40, "y2": 42, "k": "blue", "w": 1 },
+        { "t": "line", "x1": 40, "y1": 42, "x2": 40, "y2": 31.4, "k": "blue", "w": 1, "a": 1 },
+        { "t": "text", "x": 64, "y": 45.5, "v": "实际位姿反馈", "size": 2.9, "anchor": "middle", "color": "blue" },
+        { "t": "line", "x1": 1, "y1": 25.5, "x2": 2.4, "y2": 25.5, "k": "warn", "w": 1, "a": 1 },
+        { "t": "text", "x": 1, "y": 17, "v": "期望航点", "size": 2.9, "color": "warn" },
+        { "t": "text", "x": 40, "y": 17.4, "v": "偏差 → 修正量", "size": 2.9, "anchor": "middle", "color": "sub" }
+      ]
+    },
+    "loop_vision": {
+      "title": "视觉云台视场微调闭环",
+      "sub": "同视场偏差解算成云台三轴指令，把两次飞行的画面配准到同一取景",
+      "items": [
+        { "t": "rect", "x": 3, "y": 20, "w": 21, "h": 11, "rx": 1.4, "f": "panel", "k": "faint" },
+        { "t": "text", "x": 13.5, "y": 24.4, "v": "同视场偏差", "size": 2.9, "anchor": "middle", "color": "ink" },
+        { "t": "text", "x": 13.5, "y": 28.4, "v": "特征配准", "size": 2.9, "anchor": "middle", "color": "sub" },
+        { "t": "rect", "x": 31, "y": 20, "w": 22, "h": 11, "rx": 1.4, "f": "panel", "k": "faint" },
+        { "t": "text", "x": 42, "y": 26.4, "v": "单应矩阵解算", "size": 2.9, "anchor": "middle", "color": "ink" },
+        { "t": "rect", "x": 60, "y": 20, "w": 20, "h": 11, "rx": 1.4, "f": "panel", "k": "faint" },
+        { "t": "text", "x": 70, "y": 24.4, "v": "yaw / pitch", "size": 2.9, "anchor": "middle", "color": "ink" },
+        { "t": "text", "x": 70, "y": 28.4, "v": "/ roll 修正", "size": 2.9, "anchor": "middle", "color": "ink" },
+        { "t": "rect", "x": 87, "y": 20, "w": 11, "h": 11, "rx": 1.4, "f": "panel", "k": "faint" },
+        { "t": "text", "x": 92.5, "y": 26.4, "v": "云台", "size": 2.9, "anchor": "middle", "color": "ink" },
+        { "t": "line", "x1": 24, "y1": 25.5, "x2": 30.4, "y2": 25.5, "k": "accent", "w": 1, "a": 1 },
+        { "t": "line", "x1": 53, "y1": 25.5, "x2": 59.4, "y2": 25.5, "k": "accent", "w": 1, "a": 1 },
+        { "t": "line", "x1": 80, "y1": 25.5, "x2": 86.4, "y2": 25.5, "k": "accent", "w": 1, "a": 1 },
+        { "t": "line", "x1": 92.5, "y1": 31, "x2": 92.5, "y2": 42, "k": "ok", "w": 1 },
+        { "t": "line", "x1": 92.5, "y1": 42, "x2": 13.5, "y2": 42, "k": "ok", "w": 1 },
+        { "t": "line", "x1": 13.5, "y1": 42, "x2": 13.5, "y2": 31.4, "k": "ok", "w": 1, "a": 1 },
+        { "t": "text", "x": 53, "y": 45.5, "v": "下一批次实拍影像回流", "size": 2.9, "anchor": "middle", "color": "ok" },
+        { "t": "icon", "name": "gimbal", "x": 92.5, "y": 14, "size": 1.6, "color": "sub" },
+        { "t": "text", "x": 42, "y": 17.4, "v": "RANSAC 剔除误匹配", "size": 2.8, "anchor": "middle", "color": "sub" }
+      ]
+    }
+  }
+}

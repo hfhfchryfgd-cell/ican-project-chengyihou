@@ -1,0 +1,173 @@
+<!--
+  登录页插图：无人机沿航线巡检铁路桥梁。
+
+  ## 这份文件是两边共用的唯一几何
+  网页版由 `web/gen_hero.py` 注入 `web/static/login.html` 的 `gen:hero` 标记区
+  （标记写成 HTML 注释，这里不能把注释定界符写出来，写了就把本段提前结束掉），
+  桌面版由 `bridge_inspect/ui/login.py` 的 `HeroArt` 用 QSvgRenderer 直接读盘。
+  改这里，跑一次 `py web/gen_hero.py`，两边同时更新。
+
+  ## 写这张图时的约束（QtSvg 只支持 SVG 的一个子集）
+  只能用**呈现属性**。不要用 `<style>`、`class=`、`filter=`（含 drop-shadow）、
+  `mask`、`currentColor`、`<animate>`。体积感一律靠 `<linearGradient>` /
+  `<radialGradient>` + `stop-opacity` 出——普通 CSS 滤镜在 QtSvg 里不生效，
+  用了就是网页版好看、桌面版没有，而这正是"一份几何"要防的那种漂移。
+
+  ## 尺寸：按最小显示宽度定，不是按 560
+  桌面版左栏 440px、去掉留白后插图宽约 376px，对 560 单位的 viewBox 是 0.671 倍。
+  所以**中文不低于 16 单位**（→10.7px，再小就辨认吃力）、**拉丁至少 14 单位**、
+  **最细描边不低于 1.6 单位**（→1.07px）。第一版按 560 的原尺寸写了 9.5 单位字号、
+  1.2 单位描边，缩到 376 就是一团糊字与灰雾。
+
+  实测（376px 宽）：Qt 与 Chrome 各渲染一遍，去掉 `<text>` 后逐像素差 0.091%
+  （69/75576 px，纯抗锯齿），说明几何与渐变两条渲染通路一致；带文字时升到 2.1%，
+  全部来自字体栅格化——Qt 与 Chrome 的字体引擎不同，这一点无法消除，也不必消除。
+
+  ## 色值
+  取自 `core/figures.json` 的 tokens，与 theme.py / app.css 是同一套：
+  ink #DCE7F5 · sub #8FA3C0 · faint #33456A · ghost #22304A · deck #1E2C48
+  panel #16213A · accent #22D3EE · blue #3B82F6 · ok #34D399 · danger #F87171
+  SVG 里没法引用 CSS 变量（QtSvg 连 <style> 都不支持），所以这里是字面值。
+  改色请连 figures.json 的 tokens 一起改。
+
+  ## 画里为什么是这些东西
+  出现的都必须是本系统真实有的：四旋翼、航点、RTK 航线、桥墩与梁底、七类病害里的
+  两类、取景框。**装饰画成什么，观众就以为系统能做什么**——所以这里没有通用科技感素材。
+
+  注意与另外两张"无人机 + 桥"的图区分，它们不该合并：
+  `ui/hud.py` 的 paint_scene 与 `web/static/js/hud.js` 是 4% 不透明度的底纹线稿，
+  这一张是可读的品牌插图。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 300" width="560" height="300"
+     role="img" aria-label="无人机沿 RTK 航线巡检铁路桥梁，云台向桥墩投射扫描锥，桥面与桥墩上标出两处病害检测框">
+
+  <defs>
+    <linearGradient id="deck" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2F4266"/>
+      <stop offset="1" stop-color="#1B2946"/>
+    </linearGradient>
+    <linearGradient id="pier" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#243553"/>
+      <stop offset="1" stop-color="#16213A"/>
+    </linearGradient>
+    <linearGradient id="cone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#22D3EE" stop-opacity=".38"/>
+      <stop offset="1" stop-color="#22D3EE" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop offset="0" stop-color="#22D3EE" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#22D3EE" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 水面 -->
+  <path d="M0 252 H560" stroke="#22314F" stroke-width="1.8"/>
+  <path d="M0 264 q28 -5 56 0 t56 0 t56 0 t56 0 t56 0 t56 0 t56 0 t56 0 t56 0"
+        fill="none" stroke="#1B2946" stroke-width="1.8"/>
+
+  <!-- 桥墩 -->
+  <rect x="108" y="152" width="26" height="100" rx="3" fill="url(#pier)" stroke="#22314F"/>
+  <rect x="267" y="152" width="26" height="100" rx="3" fill="url(#pier)" stroke="#22314F"/>
+  <rect x="426" y="152" width="26" height="100" rx="3" fill="url(#pier)" stroke="#22314F"/>
+  <!-- 支座 -->
+  <rect x="112" y="143" width="18" height="9" rx="2" fill="#FB923C" opacity=".85"/>
+  <rect x="271" y="143" width="18" height="9" rx="2" fill="#FB923C" opacity=".85"/>
+  <rect x="430" y="143" width="18" height="9" rx="2" fill="#FB923C" opacity=".85"/>
+
+  <!-- 桥面 -->
+  <rect x="34" y="124" width="492" height="18" rx="3" fill="url(#deck)" stroke="#2F4266"/>
+
+  <!-- 铁轨：两道钢轨 + 轨枕。这是铁路桥，光板桥面看不出是铁路 -->
+  <g stroke="#8FA3C0" stroke-width="1.6" opacity=".75">
+    <path d="M40 130 H520"/>
+    <path d="M40 137 H520"/>
+  </g>
+  <g stroke="#5C6E8A" stroke-width="1.6" opacity=".5">
+    <path d="M60 127 v13M92 127 v13M124 127 v13M156 127 v13M188 127 v13M220 127 v13
+             M252 127 v13M284 127 v13M316 127 v13M348 127 v13M380 127 v13M412 127 v13
+             M444 127 v13M476 127 v13M508 127 v13"/>
+  </g>
+
+  <!-- 扫描锥：从云台指向正在检查的桥墩 -->
+  <path d="M280 94 L236 152 L324 152 Z" fill="url(#cone)"/>
+
+  <!-- 取景框：正在检查的那个桥墩，四角括线。告诉人"这一处是当前目标" -->
+  <g stroke="#22D3EE" stroke-width="2" fill="none" opacity=".9">
+    <path d="M250 166 v-20 h20"/>
+    <path d="M310 146 h20 v20"/>
+    <path d="M250 228 v20 h20"/>
+    <path d="M310 248 h20 v-20"/>
+  </g>
+
+  <!-- 病害检测框：框 + 类别名。没有这两处，这张画就只是"无人机飞过一座桥" -->
+  <g stroke="#F87171" stroke-width="1.8" fill="none">
+    <rect x="150" y="123" width="62" height="20" rx="2"/>
+    <rect x="424" y="176" width="30" height="46" rx="2"/>
+  </g>
+  <g font-family="SimSun, 宋体, Songti SC, Microsoft YaHei UI, sans-serif" font-size="17" fill="#F87171">
+    <text x="181" y="118" text-anchor="middle">渗水泛碱</text>
+    <text x="462" y="206" text-anchor="start">露筋</text>
+  </g>
+
+  <!-- 航线：虚线主航线 + 航点 -->
+  <path d="M52 62 C120 44 168 84 232 70 S360 40 420 66 S500 84 528 58"
+        fill="none" stroke="#22D3EE" stroke-width="1.8"
+        stroke-dasharray="7 6" opacity=".55"/>
+  <g fill="#0B1220" stroke="#3B82F6" stroke-width="2.4">
+    <circle cx="52"  cy="62" r="5"/>
+    <circle cx="232" cy="70" r="5"/>
+    <circle cx="420" cy="66" r="5"/>
+  </g>
+  <g fill="#0B1220" stroke="#34D399" stroke-width="2.8">
+    <circle cx="140" cy="52" r="6"/>
+    <circle cx="330" cy="60" r="6"/>
+    <circle cx="500" cy="62" r="6"/>
+  </g>
+
+  <!-- RTK 卫星信号弧 -->
+  <g fill="none" stroke="#34D399" stroke-width="1.8" opacity=".5">
+    <path d="M256 44 a30 30 0 0 1 48 0"/>
+    <path d="M248 34 a44 44 0 0 1 64 0"/>
+  </g>
+
+  <!-- 无人机 -->
+  <g transform="translate(280 78)">
+    <ellipse cx="0" cy="0" rx="54" ry="26" fill="url(#glow)"/>
+    <g stroke="#8FA3C0" stroke-width="2.6" stroke-linecap="round">
+      <path d="M-6 -3 L-26 -13"/><path d="M6 -3 L26 -13"/>
+      <path d="M-6 3 L-26 13"/> <path d="M6 3 L26 13"/>
+    </g>
+    <g fill="none" stroke="#22D3EE" stroke-width="1.8" opacity=".85">
+      <ellipse cx="-28" cy="-14" rx="12" ry="3.4"/>
+      <ellipse cx="28"  cy="-14" rx="12" ry="3.4"/>
+      <ellipse cx="-28" cy="14"  rx="12" ry="3.4"/>
+      <ellipse cx="28"  cy="14"  rx="12" ry="3.4"/>
+    </g>
+    <circle cx="-28" cy="-14" r="1.9" fill="#22D3EE"/>
+    <circle cx="28"  cy="-14" r="1.9" fill="#22D3EE"/>
+    <circle cx="-28" cy="14"  r="1.9" fill="#22D3EE"/>
+    <circle cx="28"  cy="14"  r="1.9" fill="#22D3EE"/>
+    <rect x="-13" y="-6.5" width="26" height="13" rx="5"
+          fill="#1B2946" stroke="#22D3EE" stroke-width="1.8"/>
+    <circle cx="0" cy="9" r="5" fill="#0D1728" stroke="#F87171" stroke-width="1.8"/>
+    <circle cx="0" cy="9" r="1.9" fill="#F87171"/>
+  </g>
+
+  <!-- 图注。拉丁字母用等宽体，中文用宋体——混排时等宽体的中文会掉进缺字回退 -->
+  <g font-family="Consolas, Courier New, monospace" font-size="14" fill="#8FA3C0">
+    <text x="52"  y="90">WP-A01</text>
+    <text x="330" y="86">WP-C03</text>
+    <text x="466" y="92">WP-F01</text>
+  </g>
+  <text x="240" y="180" font-family="SimSun, 宋体, Songti SC, Microsoft YaHei UI, sans-serif"
+        font-size="16" fill="#8FA3C0">RTK 固定解 · 航线重定位</text>
+
+  <!-- 图例：原来航点只有蓝绿两种颜色、没有说明，看不出区别 -->
+  <g font-family="SimSun, 宋体, Songti SC, Microsoft YaHei UI, sans-serif"
+     font-size="16" fill="#5C6E8A">
+    <circle cx="40" cy="280" r="5.5" fill="#0B1220" stroke="#3B82F6" stroke-width="2.4"/>
+    <text x="54" y="285">已采集</text>
+    <circle cx="134" cy="280" r="5.5" fill="#0B1220" stroke="#34D399" stroke-width="2.4"/>
+    <text x="148" y="285">待复飞</text>
+  </g>
+</svg>

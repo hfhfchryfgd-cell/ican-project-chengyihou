@@ -1,0 +1,11 @@
+# 桥梁智巡桌面端依赖（Python 3.10+）
+PyQt6>=6.6
+numpy>=1.24
+opencv-python>=4.8
+matplotlib>=3.7
+openpyxl>=3.1
+pillow>=10.0
+
+# 随附 YOLO / U-Net 权重的推理依赖
+torch>=2.0
+ultralytics>=8.3
